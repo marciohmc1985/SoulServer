@@ -1,0 +1,158 @@
+import React, { useState, useEffect } from 'react';
+import { Brain as BrainIcon, Send, Sparkles, Database, Activity, ShieldCheck } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
+
+interface HealthStatus {
+  status: string;
+  env: string;
+  timestamp: string;
+}
+
+export default function App() {
+  const [prompt, setPrompt] = useState('');
+  const [response, setResponse] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [health, setHealth] = useState<HealthStatus | null>(null);
+
+  useEffect(() => {
+    fetch('/api/health')
+      .then(res => res.json())
+      .then(data => setHealth(data))
+      .catch(err => console.error("Health check failed:", err));
+  }, []);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!prompt.trim()) return;
+
+    setLoading(true);
+    try {
+      const res = await fetch('/api/brain/process', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt }),
+      });
+      const data = await res.json();
+      setResponse(data.result || data.error || 'No response from Brain.');
+    } catch (err) {
+      setResponse('Failed to connect to Brain server.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-[#050505] text-white font-sans selection:bg-emerald-500/30">
+      {/* Background Glow */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-emerald-500/10 blur-[120px] rounded-full" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-500/10 blur-[120px] rounded-full" />
+      </div>
+
+      <nav className="relative z-10 border-b border-white/5 bg-black/20 backdrop-blur-md px-6 py-4 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <div className="w-10 h-10 bg-emerald-500 rounded-xl flex items-center justify-center shadow-[0_0_20px_rgba(16,185,129,0.3)]">
+            <BrainIcon className="text-black w-6 h-6" />
+          </div>
+          <span className="text-xl font-bold tracking-tight">Brain</span>
+        </div>
+        
+        <div className="flex items-center gap-6 text-xs font-mono text-white/50 uppercase tracking-widest">
+          <div className="flex items-center gap-2">
+            <Activity className={`w-3 h-3 ${health ? 'text-emerald-500' : 'text-red-500'}`} />
+            <span>{health ? 'Server Online' : 'Server Offline'}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <ShieldCheck className="w-3 h-3 text-blue-400" />
+            <span>{health?.env || 'Unknown'}</span>
+          </div>
+        </div>
+      </nav>
+
+      <main className="relative z-10 max-w-4xl mx-auto px-6 pt-20 pb-32">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center mb-16"
+        >
+          <h1 className="text-6xl md:text-8xl font-bold tracking-tighter mb-6 bg-gradient-to-b from-white to-white/40 bg-clip-text text-transparent">
+            Intelligent <br /> Processing.
+          </h1>
+          <p className="text-white/60 text-lg max-w-xl mx-auto leading-relaxed">
+            The Brain infrastructure is now active. Powered by Gemini AI and PostgreSQL, 
+            ready to process your most complex queries.
+          </p>
+        </motion.div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-12">
+          {[
+            { icon: Sparkles, label: 'Gemini AI', desc: 'Advanced LLM integration' },
+            { icon: Database, label: 'PostgreSQL', desc: 'Persistent data logging' },
+            { icon: ShieldCheck, label: 'Zod Schema', desc: 'Strict data validation' },
+          ].map((item, i) => (
+            <motion.div
+              key={item.label}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.1 }}
+              className="p-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm"
+            >
+              <item.icon className="w-6 h-6 text-emerald-400 mb-4" />
+              <h3 className="font-semibold mb-1">{item.label}</h3>
+              <p className="text-xs text-white/40">{item.desc}</p>
+            </motion.div>
+          ))}
+        </div>
+
+        <form onSubmit={handleSubmit} className="relative mb-12">
+          <input
+            type="text"
+            value={prompt}
+            onChange={(e) => setPrompt(e.target.value)}
+            placeholder="Ask Brain anything..."
+            className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-5 pr-16 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all text-lg placeholder:text-white/20"
+          />
+          <button
+            type="submit"
+            disabled={loading}
+            className="absolute right-3 top-1/2 -translate-y-1/2 w-12 h-12 bg-white text-black rounded-xl flex items-center justify-center hover:bg-emerald-400 transition-colors disabled:opacity-50"
+          >
+            {loading ? (
+              <div className="w-5 h-5 border-2 border-black/20 border-t-black rounded-full animate-spin" />
+            ) : (
+              <Send className="w-5 h-5" />
+            )}
+          </button>
+        </form>
+
+        <AnimatePresence mode="wait">
+          {response && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="p-8 rounded-3xl bg-emerald-500/5 border border-emerald-500/20 relative overflow-hidden group"
+            >
+              <div className="absolute top-0 left-0 w-1 h-full bg-emerald-500" />
+              <div className="flex items-start gap-4">
+                <div className="mt-1">
+                  <Sparkles className="w-5 h-5 text-emerald-400" />
+                </div>
+                <div className="flex-1">
+                  <h4 className="text-xs font-mono text-emerald-400 uppercase tracking-widest mb-3">Brain Response</h4>
+                  <div className="prose prose-invert max-w-none text-white/80 leading-relaxed whitespace-pre-wrap">
+                    {response}
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </main>
+
+      <footer className="fixed bottom-0 left-0 w-full p-6 text-center text-[10px] font-mono text-white/20 uppercase tracking-[0.2em] pointer-events-none">
+        Brain Infrastructure v1.0.0 • {health?.timestamp || 'System Booting'}
+      </footer>
+    </div>
+  );
+}

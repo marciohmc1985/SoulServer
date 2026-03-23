@@ -1,0 +1,3 @@
+Esta pasta centraliza as configurações globais do sistema.
+Aqui inicializamos os clientes da Google Gemini AI e do PostgreSQL.
+O objetivo é ter um único ponto de verdade para as conexões externas.
