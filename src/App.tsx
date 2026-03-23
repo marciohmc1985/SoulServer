@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Brain as BrainIcon, Send, Sparkles, Database, Activity, ShieldCheck } from 'lucide-react';
+import { Brain as BrainIcon, Send, Sparkles, Database, Activity, ShieldCheck, User } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import PersonasPage from './pages/PersonasPage.tsx';
 
 interface HealthStatus {
   status: string;
@@ -8,17 +9,34 @@ interface HealthStatus {
   timestamp: string;
 }
 
+interface Persona {
+  id: number;
+  nome: string;
+}
+
 export default function App() {
+  const [currentPage, setCurrentPage] = useState<'chat' | 'personas'>('chat');
   const [prompt, setPrompt] = useState('');
   const [response, setResponse] = useState('');
+  const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [health, setHealth] = useState<HealthStatus | null>(null);
+  const [personas, setPersonas] = useState<Persona[]>([]);
+  const [selectedPersonaId, setSelectedPersonaId] = useState<number | undefined>(undefined);
 
   useEffect(() => {
     fetch('/api/health')
       .then(res => res.json())
       .then(data => setHealth(data))
       .catch(err => console.error("Health check failed:", err));
+
+    fetch('/api/personas')
+      .then(res => res.json())
+      .then(data => {
+        setPersonas(data);
+        if (data.length > 0) setSelectedPersonaId(data[0].id);
+      })
+      .catch(err => console.error("Failed to fetch personas:", err));
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -26,20 +44,36 @@ export default function App() {
     if (!prompt.trim()) return;
 
     setLoading(true);
+    setError(null);
+    setResponse('');
+    
     try {
       const res = await fetch('/api/brain/process', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt }),
+        body: JSON.stringify({ 
+          prompt,
+          personaId: selectedPersonaId
+        }),
       });
+      
       const data = await res.json();
-      setResponse(data.result || data.error || 'No response from Brain.');
+      
+      if (!res.ok) {
+        setError(data.error || 'Ocorreu um erro no processamento.');
+      } else {
+        setResponse(data.result || 'O cérebro não retornou conteúdo.');
+      }
     } catch (err) {
-      setResponse('Failed to connect to Brain server.');
+      setError('Falha na conexão com o servidor do Brain.');
     } finally {
       setLoading(false);
     }
   };
+
+  if (currentPage === 'personas') {
+    return <PersonasPage onBack={() => setCurrentPage('chat')} />;
+  }
 
   return (
     <div className="min-h-screen bg-[#050505] text-white font-sans selection:bg-emerald-500/30">
@@ -57,14 +91,17 @@ export default function App() {
           <span className="text-xl font-bold tracking-tight">Brain</span>
         </div>
         
-        <div className="flex items-center gap-6 text-xs font-mono text-white/50 uppercase tracking-widest">
-          <div className="flex items-center gap-2">
+        <div className="flex items-center gap-6">
+          <button 
+            onClick={() => setCurrentPage('personas')}
+            className="flex items-center gap-2 text-xs font-mono text-white/50 uppercase tracking-widest hover:text-emerald-400 transition-colors"
+          >
+            <User className="w-3 h-3" />
+            <span>Personas</span>
+          </button>
+          <div className="flex items-center gap-2 text-xs font-mono text-white/50 uppercase tracking-widest">
             <Activity className={`w-3 h-3 ${health ? 'text-emerald-500' : 'text-red-500'}`} />
             <span>{health ? 'Server Online' : 'Server Offline'}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <ShieldCheck className="w-3 h-3 text-blue-400" />
-            <span>{health?.env || 'Unknown'}</span>
           </div>
         </div>
       </nav>
@@ -105,27 +142,75 @@ export default function App() {
         </div>
 
         <form onSubmit={handleSubmit} className="relative mb-12">
-          <input
-            type="text"
-            value={prompt}
-            onChange={(e) => setPrompt(e.target.value)}
-            placeholder="Ask Brain anything..."
-            className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-5 pr-16 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all text-lg placeholder:text-white/20"
-          />
-          <button
-            type="submit"
-            disabled={loading}
-            className="absolute right-3 top-1/2 -translate-y-1/2 w-12 h-12 bg-white text-black rounded-xl flex items-center justify-center hover:bg-emerald-400 transition-colors disabled:opacity-50"
-          >
-            {loading ? (
-              <div className="w-5 h-5 border-2 border-black/20 border-t-black rounded-full animate-spin" />
-            ) : (
-              <Send className="w-5 h-5" />
-            )}
-          </button>
+          <div className="flex flex-col gap-4">
+            <div className="flex items-center gap-4">
+              <div className="flex-1 relative">
+                <input
+                  type="text"
+                  value={prompt}
+                  onChange={(e) => setPrompt(e.target.value)}
+                  placeholder="Ask Brain anything..."
+                  className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-5 pr-16 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all text-lg placeholder:text-white/20"
+                />
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 w-12 h-12 bg-white text-black rounded-xl flex items-center justify-center hover:bg-emerald-400 transition-colors disabled:opacity-50"
+                >
+                  {loading ? (
+                    <div className="w-5 h-5 border-2 border-black/20 border-t-black rounded-full animate-spin" />
+                  ) : (
+                    <Send className="w-5 h-5" />
+                  )}
+                </button>
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-3 px-2">
+              <span className="text-[10px] font-mono text-white/20 uppercase tracking-widest">Atuando como:</span>
+              <div className="flex flex-wrap gap-2">
+                {personas.map((p) => (
+                  <button
+                    key={p.id}
+                    type="button"
+                    onClick={() => setSelectedPersonaId(p.id)}
+                    className={`px-3 py-1.5 rounded-lg text-[11px] font-medium transition-all ${
+                      selectedPersonaId === p.id 
+                        ? 'bg-emerald-500 text-black shadow-[0_0_15px_rgba(16,185,129,0.2)]' 
+                        : 'bg-white/5 text-white/40 hover:bg-white/10'
+                    }`}
+                  >
+                    {p.nome}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
         </form>
 
         <AnimatePresence mode="wait">
+          {error && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="p-8 rounded-3xl bg-red-500/5 border border-red-500/20 relative overflow-hidden mb-6"
+            >
+              <div className="absolute top-0 left-0 w-1 h-full bg-red-500" />
+              <div className="flex items-start gap-4">
+                <div className="mt-1">
+                  <ShieldCheck className="w-5 h-5 text-red-400" />
+                </div>
+                <div className="flex-1">
+                  <h4 className="text-xs font-mono text-red-400 uppercase tracking-widest mb-3">System Error</h4>
+                  <div className="text-red-200/70 leading-relaxed">
+                    {error}
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+
           {response && (
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}

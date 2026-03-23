@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { processBrainRequest } from "./modules/ai/ai.controller.ts";
+import personasRouter from "./modules/personas/routes.ts";
 
 const router = Router();
 
@@ -20,5 +21,11 @@ router.get("/health", (req, res) => {
  * Recebe o prompt e retorna a inteligência do Brain.
  */
 router.post("/brain/process", processBrainRequest);
+
+/**
+ * Rotas de Personas (Almas)
+ * Gerenciamento de personalidades da IA.
+ */
+router.use("/personas", personasRouter);
 
 export default router;
