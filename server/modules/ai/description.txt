@@ -1,2 +1,0 @@
-Módulo responsável pela comunicação com os modelos de linguagem da Google (Gemini).
-Contém o serviço (lógica de IA) e o controller (ponte com a API).

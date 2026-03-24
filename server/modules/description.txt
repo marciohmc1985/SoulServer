@@ -1,3 +1,0 @@
-Esta pasta contém os módulos funcionais do sistema.
-Cada submódulo (ex: ai, db) é independente e responsável por uma funcionalidade específica.
-Isso permite que o sistema cresça sem que as partes fiquem excessivamente acopladas.

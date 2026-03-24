@@ -1,2 +1,0 @@
-Módulo responsável pela persistência de dados e definições de modelos.
-Gerencia as queries ao PostgreSQL e as validações de dados (Zod).
