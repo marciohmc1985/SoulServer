@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Brain as BrainIcon, Send, Sparkles, Database, Activity, ShieldCheck, User } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { GoogleGenAI } from "@google/genai";
 import PersonasPage from './pages/PersonasPage.tsx';
 
 interface HealthStatus {
@@ -12,6 +13,9 @@ interface HealthStatus {
 interface Persona {
   id: number;
   nome: string;
+  instrucao_sistema: string;
+  temperatura: number;
+  modelo: string;
 }
 
 export default function App() {
@@ -48,24 +52,45 @@ export default function App() {
     setResponse('');
     
     try {
-      const res = await fetch('/api/brain/process', {
+      // 1. Identifica a persona selecionada
+      const persona = personas.find(p => p.id === selectedPersonaId);
+      
+      // 2. Inicializa o Gemini no Frontend (Conforme diretrizes)
+      const apiKey = process.env.GEMINI_API_KEY;
+      if (!apiKey) {
+        throw new Error("GEMINI_API_KEY não encontrada no ambiente.");
+      }
+
+      const ai = new GoogleGenAI({ apiKey });
+      const modelName = persona?.modelo || "gemini-3-flash-preview";
+      
+      // 3. Gera a resposta
+      const aiResponse = await ai.models.generateContent({
+        model: modelName,
+        contents: [{ parts: [{ text: prompt }] }],
+        config: {
+          systemInstruction: persona?.instrucao_sistema || "Você é o Brain, uma inteligência artificial avançada.",
+          temperature: persona?.temperatura ?? 0.7,
+        }
+      });
+
+      const resultText = aiResponse.text || "O cérebro não conseguiu gerar uma resposta.";
+      setResponse(resultText);
+
+      // 4. Envia para o backend APENAS para LOG (Registro no Banco)
+      fetch('/api/brain/process', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           prompt,
-          personaId: selectedPersonaId
+          personaId: selectedPersonaId,
+          result: resultText // Enviamos o resultado para ser logado
         }),
-      });
-      
-      const data = await res.json();
-      
-      if (!res.ok) {
-        setError(data.error || 'Ocorreu um erro no processamento.');
-      } else {
-        setResponse(data.result || 'O cérebro não retornou conteúdo.');
-      }
-    } catch (err) {
-      setError('Falha na conexão com o servidor do Brain.');
+      }).catch(err => console.error("Erro ao enviar log para o servidor:", err));
+
+    } catch (err: any) {
+      console.error("Erro no processamento:", err);
+      setError(err.message || 'Falha na comunicação com a IA.');
     } finally {
       setLoading(false);
     }

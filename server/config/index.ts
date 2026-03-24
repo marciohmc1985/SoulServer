@@ -17,10 +17,12 @@ export const genAI = new GoogleGenAI({
  * Configuração do Pool de Conexão PostgreSQL
  * Gerencia múltiplas conexões para maior performance.
  */
+const isLocal = process.env.DATABASE_URL?.includes("localhost") || process.env.DATABASE_URL?.includes("127.0.0.1");
+
 export const pool = new pg.Pool({
   connectionString: process.env.DATABASE_URL,
-  // Habilita SSL em produção para conexões seguras (ex: Cloud SQL/Neon)
-  ssl: process.env.APP_ENV === "production" ? { rejectUnauthorized: false } : false,
+  // Habilita SSL para conexões remotas (obrigatório em Neon, Supabase, etc.)
+  ssl: !isLocal && process.env.DATABASE_URL ? { rejectUnauthorized: false } : false,
 });
 
 // Log de inicialização das configurações

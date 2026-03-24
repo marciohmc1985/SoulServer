@@ -35,25 +35,28 @@ export class PersonasService {
     `;
 
     try {
+      console.log("[PersonasService] Iniciando inicialização da tabela 'personas'...");
       await pool.query(createTableQuery);
       console.log("[PersonasService] Tabela 'personas' verificada/criada.");
-
+ 
       // Verifica se já existem personas
       const checkQuery = "SELECT COUNT(*) FROM personas";
       const checkResult = await pool.query(checkQuery);
       const count = parseInt(checkResult.rows[0].count);
-
+      console.log(`[PersonasService] Total de personas encontradas: ${count}`);
+ 
       if (count === 0) {
         console.log("[PersonasService] Semeando persona padrão...");
-        await this.create({
+        const defaultPersona = await this.create({
           nome: "Brain Core",
           instrucao_sistema: "Você é o Brain, uma inteligência artificial avançada, lógica e prestativa. Responda sempre de forma clara e estruturada.",
           temperatura: 0.7,
           modelo: "gemini-3-flash-preview"
         });
+        console.log("[PersonasService] Persona padrão criada com ID:", defaultPersona?.id);
       }
     } catch (error) {
-      console.error("[PersonasService] Erro ao inicializar tabela/seed:", error);
+      console.error("[PersonasService] ERRO CRÍTICO ao inicializar tabela/seed:", error);
     }
   }
 
@@ -66,6 +69,7 @@ export class PersonasService {
     const query = "SELECT * FROM personas ORDER BY nome ASC";
     try {
       const result = await pool.query(query);
+      console.log(`[PersonasService] Listando ${result.rows.length} personas.`);
       return result.rows;
     } catch (error) {
       console.error("[PersonasService] Erro ao listar personas:", error);

@@ -1,5 +1,6 @@
 import { createApp } from "./server/app.ts";
 import { PersonasService } from "./server/modules/personas/service.ts";
+import { DBService } from "./server/modules/db/db.service.ts";
 
 /**
  * Ponto de Entrada do Servidor Brain (v1.5)
@@ -11,7 +12,19 @@ async function bootstrap() {
   try {
     // Inicializa as tabelas do banco de dados
     const personasService = new PersonasService();
+    const dbService = new DBService();
+    
+    // Teste de conexão simples
+    try {
+      const { pool } = await import("./server/config/index.ts");
+      await pool.query("SELECT NOW()");
+      console.log("[DB] Conexão com PostgreSQL estabelecida com sucesso.");
+    } catch (dbError) {
+      console.error("[DB] FALHA NA CONEXÃO COM O BANCO DE DADOS:", dbError);
+    }
+
     await personasService.initTable();
+    await dbService.initTable();
 
     const app = await createApp();
     

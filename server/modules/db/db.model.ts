@@ -9,6 +9,8 @@ export const BrainQuerySchema = z.object({
   prompt: z.string().min(1, "O prompt não pode estar vazio"),
   // ID da persona selecionada
   personaId: z.number().optional(),
+  // O resultado gerado pela IA (para fins de log)
+  result: z.string().optional(),
   // Contexto opcional para futuras expansões
   context: z.record(z.string(), z.any()).optional(),
 });
