@@ -1,0 +1,3 @@
+Esta pasta contém a lógica central do servidor (Backend) do projeto Brain.
+A estrutura é modular, separando configurações, rotas e lógica de negócio (módulos).
+Aqui orquestramos a integração entre a IA, o Banco de Dados e o Frontend.
