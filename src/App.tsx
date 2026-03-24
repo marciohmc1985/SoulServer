@@ -134,19 +134,19 @@ export default function App() {
           className="text-center mb-16"
         >
           <h1 className="text-6xl md:text-8xl font-bold tracking-tighter mb-6 bg-gradient-to-b from-white to-white/40 bg-clip-text text-transparent">
-            Intelligent <br /> Processing.
+          "SoulServer 1.0"   <br /> .
           </h1>
           <p className="text-white/60 text-lg max-w-xl mx-auto leading-relaxed">
-            The Brain infrastructure is now active. Powered by Gemini AI and PostgreSQL, 
-            ready to process your most complex queries.
-          </p>
+          A infraestrutura do Brain já está ativa. Impulsionada pela IA ,
+            está pronta para processar suas consultas mais complexas."
+            </p>
         </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-12">
           {[
-            { icon: Sparkles, label: 'Gemini AI', desc: 'Advanced LLM integration' },
-            { icon: Database, label: 'PostgreSQL', desc: 'Persistent data logging' },
-            { icon: ShieldCheck, label: 'Zod Schema', desc: 'Strict data validation' },
+       //     { icon: Sparkles, label: 'Gemini AI', desc: 'Advanced LLM integration' },
+       //     { icon: Database, label: 'PostgreSQL', desc: 'Persistent data logging' },
+       //     { icon: ShieldCheck, label: 'Zod Schema', desc: 'Strict data validation' },
           ].map((item, i) => (
             <motion.div
               key={item.label}
@@ -170,7 +170,7 @@ export default function App() {
                   type="text"
                   value={prompt}
                   onChange={(e) => setPrompt(e.target.value)}
-                  placeholder="Ask Brain anything..."
+                  placeholder="PERGUNTE QUALQUER COISA..."
                   className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-5 pr-16 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all text-lg placeholder:text-white/20"
                 />
                 <button
