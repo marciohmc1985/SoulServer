@@ -84,8 +84,8 @@ export default function PersonasPage({ onBack }: PersonasPageProps) {
   };
 
   return (
-    <div className="min-h-screen bg-[#050505] text-white font-sans">
-      <nav className="border-b border-white/5 bg-black/20 backdrop-blur-md px-6 py-4 flex items-center justify-between sticky top-0 z-20">
+    <div className="min-h-screen bg-cyber-black text-white font-sans">
+      <nav className="border-b border-white/5 bg-black/40 backdrop-blur-xl px-6 py-4 flex items-center justify-between sticky top-0 z-20">
         <div className="flex items-center gap-4">
           <button 
             onClick={onBack}
@@ -94,18 +94,18 @@ export default function PersonasPage({ onBack }: PersonasPageProps) {
             <ArrowLeft className="w-5 h-5 text-white/60" />
           </button>
           <div className="flex items-center gap-2">
-            <User className="text-emerald-500 w-6 h-6" />
-            <span className="text-xl font-bold tracking-tight">Gerenciar Personas</span>
+            <User className="text-cyber-cyan w-6 h-6" />
+            <span className="text-xl font-black tracking-tighter uppercase">Neural Almas</span>
           </div>
         </div>
         
         {!isAdding && (
           <button
             onClick={() => { setIsAdding(true); setEditingPersona(null); setFormData({ nome: '', instrucao_sistema: '', temperatura: 0, modelo: 'gemini-3-flash-preview' }); }}
-            className="flex items-center gap-2 bg-white text-black px-4 py-2 rounded-xl font-medium hover:bg-emerald-400 transition-colors"
+            className="flex items-center gap-2 bg-cyber-cyan text-black px-4 py-2 rounded-xl font-bold hover:bg-white transition-colors shadow-[0_0_20px_rgba(0,242,255,0.3)]"
           >
             <Plus className="w-4 h-4" />
-            Nova Persona
+            Nova Alma
           </button>
         )}
       </nav>
@@ -136,7 +136,7 @@ export default function PersonasPage({ onBack }: PersonasPageProps) {
                         value={formData.nome}
                         onChange={(e) => setFormData({ ...formData, nome: e.target.value })}
                         placeholder="Ex: Stark, Elias..."
-                        className="w-full bg-black/40 border border-white/10 rounded-xl py-3 pl-12 pr-4 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+                        className="w-full bg-black/40 border border-white/10 rounded-xl py-3 pl-12 pr-4 focus:outline-none focus:ring-2 focus:ring-cyber-cyan/50 font-mono"
                       />
                     </div>
                   </div>
@@ -148,11 +148,11 @@ export default function PersonasPage({ onBack }: PersonasPageProps) {
                       <select
                         value={formData.modelo}
                         onChange={(e) => setFormData({ ...formData, modelo: e.target.value })}
-                        className="w-full bg-black/40 border border-white/10 rounded-xl py-3 pl-12 pr-4 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 appearance-none"
+                        className="w-full bg-black/40 border border-white/10 rounded-xl py-3 pl-12 pr-4 focus:outline-none focus:ring-2 focus:ring-cyber-cyan/50 appearance-none font-mono"
                       >
                         <option value="gemini-3-flash-preview">Gemini 3 Flash</option>
                         <option value="gemini-3.1-pro-preview">Gemini 3.1 Pro</option>
-                        <option value="gpt-4o">GPT-4o (Mock)</option>
+                        <option value="gemini-3.1-flash-lite-preview">Gemini 3.1 Flash Lite</option>
                       </select>
                     </div>
                   </div>
@@ -168,7 +168,7 @@ export default function PersonasPage({ onBack }: PersonasPageProps) {
                       value={formData.instrucao_sistema}
                       onChange={(e) => setFormData({ ...formData, instrucao_sistema: e.target.value })}
                       placeholder="Defina a personalidade, tom de voz e restrições..."
-                      className="w-full bg-black/40 border border-white/10 rounded-xl py-4 pl-12 pr-4 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+                      className="w-full bg-black/40 border border-white/10 rounded-xl py-4 pl-12 pr-4 focus:outline-none focus:ring-2 focus:ring-cyber-cyan/50 font-mono"
                     />
                   </div>
                 </div>
@@ -183,33 +183,33 @@ export default function PersonasPage({ onBack }: PersonasPageProps) {
                       {formData.temperatura === 0 ? 'Determinística' : formData.temperatura === 1 ? 'Criativa' : 'Equilibrada'}
                     </span>
                   </div>
-                  <input
-                    type="range"
-                    min="0"
-                    max="1"
-                    step="0.1"
-                    value={formData.temperatura}
-                    onChange={(e) => setFormData({ ...formData, temperatura: parseFloat(e.target.value) })}
-                    className="w-full accent-emerald-500 h-1 bg-white/10 rounded-lg appearance-none cursor-pointer"
-                  />
-                </div>
+                    <input
+                      type="range"
+                      min="0"
+                      max="1"
+                      step="0.1"
+                      value={formData.temperatura}
+                      onChange={(e) => setFormData({ ...formData, temperatura: parseFloat(e.target.value) })}
+                      className="w-full accent-cyber-cyan h-1 bg-white/10 rounded-lg appearance-none cursor-pointer"
+                    />
+                  </div>
 
-                <div className="flex items-center gap-4 pt-4">
-                  <button
-                    type="submit"
-                    className="flex-1 bg-emerald-500 text-black font-bold py-4 rounded-2xl hover:bg-emerald-400 transition-colors flex items-center justify-center gap-2"
-                  >
-                    <Save className="w-5 h-5" />
-                    Salvar Persona
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setIsAdding(false)}
-                    className="px-8 py-4 bg-white/5 border border-white/10 rounded-2xl hover:bg-white/10 transition-colors"
-                  >
-                    Cancelar
-                  </button>
-                </div>
+                  <div className="flex items-center gap-4 pt-4">
+                    <button
+                      type="submit"
+                      className="flex-1 bg-cyber-purple text-white font-bold py-4 rounded-2xl hover:bg-white hover:text-black transition-colors flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(188,0,255,0.3)]"
+                    >
+                      <Save className="w-5 h-5" />
+                      Sincronizar Alma
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setIsAdding(false)}
+                      className="px-8 py-4 bg-white/5 border border-white/10 rounded-2xl hover:bg-white/10 transition-colors font-mono uppercase text-xs tracking-widest"
+                    >
+                      Abortar
+                    </button>
+                  </div>
               </form>
             </motion.div>
           ) : (
@@ -228,57 +228,57 @@ export default function PersonasPage({ onBack }: PersonasPageProps) {
                   <p className="text-white/40">Nenhuma persona cadastrada ainda.</p>
                 </div>
               ) : (
-                personas.map((p) => (
-                  <motion.div
-                    key={p.id}
-                    layoutId={`persona-${p.id}`}
-                    className="group bg-white/5 border border-white/10 rounded-3xl p-6 hover:border-emerald-500/50 transition-all"
-                  >
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 bg-emerald-500/10 rounded-2xl flex items-center justify-center text-emerald-500">
-                          <User className="w-6 h-6" />
+                  personas.map((p) => (
+                    <motion.div
+                      key={p.id}
+                      layoutId={`persona-${p.id}`}
+                      className="group bg-white/5 border border-white/10 rounded-3xl p-6 hover:border-cyber-cyan/50 transition-all backdrop-blur-sm"
+                    >
+                      <div className="flex items-start justify-between mb-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-12 h-12 bg-cyber-cyan/10 rounded-2xl flex items-center justify-center text-cyber-cyan">
+                            <User className="w-6 h-6" />
+                          </div>
+                          <div>
+                            <h3 className="font-bold text-lg uppercase tracking-tight">{p.nome}</h3>
+                            <span className="text-[10px] font-mono text-white/20 uppercase tracking-widest">{p.modelo}</span>
+                          </div>
                         </div>
-                        <div>
-                          <h3 className="font-bold text-lg">{p.nome}</h3>
-                          <span className="text-[10px] font-mono text-white/20 uppercase tracking-widest">{p.modelo}</span>
+                        <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <button 
+                            onClick={() => startEdit(p)}
+                            className="p-2 hover:bg-white/10 rounded-lg text-white/60 hover:text-cyber-cyan transition-colors"
+                          >
+                            <Save className="w-4 h-4" />
+                          </button>
+                          <button 
+                            onClick={() => p.id && handleDelete(p.id)}
+                            className="p-2 hover:bg-cyber-red/20 rounded-lg text-white/60 hover:text-cyber-red transition-colors"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
                         </div>
                       </div>
-                      <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button 
-                          onClick={() => startEdit(p)}
-                          className="p-2 hover:bg-white/10 rounded-lg text-white/60 hover:text-white transition-colors"
-                        >
-                          <Save className="w-4 h-4" />
-                        </button>
-                        <button 
-                          onClick={() => p.id && handleDelete(p.id)}
-                          className="p-2 hover:bg-red-500/20 rounded-lg text-white/60 hover:text-red-400 transition-colors"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </div>
-                    
-                    <p className="text-sm text-white/40 line-clamp-3 mb-6 italic">
-                      "{p.instrucao_sistema}"
-                    </p>
+                      
+                      <p className="text-sm text-white/40 line-clamp-3 mb-6 italic font-mono">
+                        "{p.instrucao_sistema}"
+                      </p>
 
-                    <div className="flex items-center justify-between pt-4 border-t border-white/5">
-                      <div className="flex items-center gap-4">
-                        <div className="flex items-center gap-1.5">
-                          <Thermometer className="w-3 h-3 text-emerald-500" />
-                          <span className="text-xs font-mono text-white/60">{p.temperatura}</span>
+                      <div className="flex items-center justify-between pt-4 border-t border-white/5">
+                        <div className="flex items-center gap-4">
+                          <div className="flex items-center gap-1.5">
+                            <Thermometer className="w-3 h-3 text-cyber-cyan" />
+                            <span className="text-xs font-mono text-white/60">{p.temperatura}</span>
+                          </div>
+                          <div className="flex items-center gap-1.5">
+                            <Cpu className="w-3 h-3 text-cyber-purple" />
+                            <span className="text-xs font-mono text-white/60">{p.modelo.split('-')[0]}</span>
+                          </div>
                         </div>
-                        <div className="flex items-center gap-1.5">
-                          <Cpu className="w-3 h-3 text-blue-400" />
-                          <span className="text-xs font-mono text-white/60">{p.modelo.split('-')[0]}</span>
-                        </div>
+                        <span className="text-[10px] font-mono text-white/20 uppercase">ID: #{p.id}</span>
                       </div>
-                      <span className="text-[10px] font-mono text-white/20 uppercase">ID: #{p.id}</span>
-                    </div>
-                  </motion.div>
-                ))
+                    </motion.div>
+                  ))
               )}
             </motion.div>
           )}

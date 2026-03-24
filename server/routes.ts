@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { processBrainRequest } from "./modules/ai/ai.controller.ts";
 import personasRouter from "./modules/personas/routes.ts";
+import knowledgeBaseRouter from "./modules/knowledge_base/routes.ts";
 
 const router = Router();
 
@@ -27,5 +28,11 @@ router.post("/brain/process", processBrainRequest);
  * Gerenciamento de personalidades da IA.
  */
 router.use("/personas", personasRouter);
+
+/**
+ * Rotas de Base de Conhecimento
+ * Gerenciamento de manuais e arquivos vinculados às personas.
+ */
+router.use("/knowledge", knowledgeBaseRouter);
 
 export default router;
