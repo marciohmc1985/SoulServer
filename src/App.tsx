@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Brain as BrainIcon, Send, Sparkles, Database, Activity, ShieldCheck, User } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Brain as BrainIcon, Send, Sparkles, Database, Activity, ShieldCheck, User, Mic, MicOff, Volume2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { GoogleGenAI } from "@google/genai";
 import PersonasPage from './pages/PersonasPage.tsx';
@@ -27,6 +27,63 @@ export default function App() {
   const [health, setHealth] = useState<HealthStatus | null>(null);
   const [personas, setPersonas] = useState<Persona[]>([]);
   const [selectedPersonaId, setSelectedPersonaId] = useState<number | undefined>(undefined);
+  const [isListening, setIsListening] = useState(false);
+  const recognitionRef = useRef<any>(null);
+
+  useEffect(() => {
+    // Initialize Speech Recognition
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (SpeechRecognition) {
+      recognitionRef.current = new SpeechRecognition();
+      recognitionRef.current.continuous = false;
+      recognitionRef.current.interimResults = false;
+      recognitionRef.current.lang = 'pt-BR';
+
+      recognitionRef.current.onresult = (event: any) => {
+        const transcript = event.results[0][0].transcript;
+        setPrompt(transcript);
+        setIsListening(false);
+      };
+
+      recognitionRef.current.onerror = (event: any) => {
+        console.error("Speech recognition error:", event.error);
+        setIsListening(false);
+      };
+
+      recognitionRef.current.onend = () => {
+        setIsListening(false);
+      };
+    }
+  }, []);
+
+  const toggleListening = () => {
+    if (isListening) {
+      recognitionRef.current?.stop();
+      setIsListening(false);
+    } else {
+      try {
+        recognitionRef.current?.start();
+        setIsListening(true);
+      } catch (err) {
+        console.error("Failed to start recognition:", err);
+      }
+    }
+  };
+
+  const speak = (text: string) => {
+    if ('speechSynthesis' in window) {
+      // Cancel any ongoing speech
+      window.speechSynthesis.cancel();
+      
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'pt-BR';
+      utterance.rate = 1.0;
+      utterance.pitch = 1.0;
+      window.speechSynthesis.speak(utterance);
+    } else {
+      alert("Seu navegador não suporta síntese de voz.");
+    }
+  };
 
   useEffect(() => {
     fetch('/api/health')
@@ -134,7 +191,7 @@ export default function App() {
           className="text-center mb-16"
         >
           <h1 className="text-6xl md:text-8xl font-bold tracking-tighter mb-6 bg-gradient-to-b from-white to-white/40 bg-clip-text text-transparent">
-          "SoulServer 1.0"   <br /> .
+          SoulServer 1.0   <br /> 
           </h1>
           <p className="text-white/60 text-lg max-w-xl mx-auto leading-relaxed">
           A infraestrutura do Brain já está ativa. Impulsionada pela IA ,
@@ -171,19 +228,33 @@ export default function App() {
                   value={prompt}
                   onChange={(e) => setPrompt(e.target.value)}
                   placeholder="PERGUNTE QUALQUER COISA..."
-                  className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-5 pr-16 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all text-lg placeholder:text-white/20"
+                  className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-5 pr-32 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all text-lg placeholder:text-white/20"
                 />
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 w-12 h-12 bg-white text-black rounded-xl flex items-center justify-center hover:bg-emerald-400 transition-colors disabled:opacity-50"
-                >
-                  {loading ? (
-                    <div className="w-5 h-5 border-2 border-black/20 border-t-black rounded-full animate-spin" />
-                  ) : (
-                    <Send className="w-5 h-5" />
-                  )}
-                </button>
+                <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={toggleListening}
+                    className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${
+                      isListening 
+                        ? 'bg-red-500 text-white animate-pulse' 
+                        : 'bg-white/5 text-white/40 hover:bg-white/10'
+                    }`}
+                    title={isListening ? "Parar de ouvir" : "Falar"}
+                  >
+                    {isListening ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="w-12 h-12 bg-white text-black rounded-xl flex items-center justify-center hover:bg-emerald-400 transition-colors disabled:opacity-50"
+                  >
+                    {loading ? (
+                      <div className="w-5 h-5 border-2 border-black/20 border-t-black rounded-full animate-spin" />
+                    ) : (
+                      <Send className="w-5 h-5" />
+                    )}
+                  </button>
+                </div>
               </div>
             </div>
             
@@ -245,7 +316,16 @@ export default function App() {
                   <Sparkles className="w-5 h-5 text-emerald-400" />
                 </div>
                 <div className="flex-1">
-                  <h4 className="text-xs font-mono text-emerald-400 uppercase tracking-widest mb-3">Brain Response</h4>
+                  <div className="flex items-center justify-between mb-3">
+                    <h4 className="text-xs font-mono text-emerald-400 uppercase tracking-widest">Brain Response</h4>
+                    <button
+                      onClick={() => speak(response)}
+                      className="p-2 bg-white/5 hover:bg-white/10 rounded-lg text-emerald-400 transition-colors"
+                      title="Ouvir resposta"
+                    >
+                      <Volume2 className="w-4 h-4" />
+                    </button>
+                  </div>
                   <div className="prose prose-invert max-w-none text-white/80 leading-relaxed whitespace-pre-wrap">
                     {response}
                   </div>
