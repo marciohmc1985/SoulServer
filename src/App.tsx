@@ -191,12 +191,12 @@ export default function App() {
           className="text-center mb-16"
         >
           <h1 className="text-6xl md:text-8xl font-bold tracking-tighter mb-6 bg-gradient-to-b from-white to-white/40 bg-clip-text text-transparent">
-          SoulServer 1.0   <br /> 
+            SoulServer 1.0 <br />
           </h1>
           <p className="text-white/60 text-lg max-w-xl mx-auto leading-relaxed">
-          A infraestrutura do Brain já está ativa. Impulsionada pela IA ,
-            está pronta para processar suas consultas mais complexas."
-            </p>
+            A infraestrutura do Brain já está ativa. Impulsionada pela IA,
+            está pronta para processar suas consultas mais complexas.
+          </p>
         </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-12">
