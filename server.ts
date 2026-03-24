@@ -1,7 +1,6 @@
 import { createApp } from "./server/app.ts";
 import { PersonasService } from "./server/modules/personas/service.ts";
 import { DBService } from "./server/modules/db/db.service.ts";
-import { KnowledgeBaseService } from "./server/modules/knowledge_base/service.ts";
 
 /**
  * Ponto de Entrada do Servidor Brain (v1.5)
@@ -14,7 +13,6 @@ async function bootstrap() {
     // Inicializa as tabelas do banco de dados
     const personasService = new PersonasService();
     const dbService = new DBService();
-    const knowledgeBaseService = new KnowledgeBaseService();
     
     // Teste de conexão simples
     try {
@@ -27,7 +25,6 @@ async function bootstrap() {
 
     await personasService.initTable();
     await dbService.initTable();
-    await knowledgeBaseService.initTable();
 
     const app = await createApp();
     
